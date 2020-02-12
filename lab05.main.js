@@ -59,7 +59,6 @@ class ServiceNowAdapter extends EventEmitter {
     // Copy arguments' values to object properties.
     this.id = id;
     this.props = adapterProperties;
-    this.getRecord=
     // Instantiate an object from the connector.js module and assign it to an object property.
     this.connector = new ServiceNowConnector({
       url: this.props.url,
@@ -155,7 +154,14 @@ class ServiceNowAdapter extends EventEmitter {
      * Note how the object was instantiated in the constructor().
      * get() takes a callback function.
      */
-    this.connector.get((data, error) => {
+      const conn = new ServiceNowConnector({
+      url: this.props.url,
+      username: this.props.auth.username,
+      password: this.props.auth.password,
+      serviceNowTable: this.props.serviceNowTable
+    });
+
+    conn.get((data, error) => {
     if (error) {
       console.error(`\nError returned from GET request:\n${JSON.stringify(error)}`);
     }

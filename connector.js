@@ -188,6 +188,7 @@ isHibernating(response) {
     baseUrl: this.options.url,
     uri: uri
   };
+  
   request(requestOptions, (error, response, body) => {
     this.processRequestResults(error, response, body, (processedResults, processedError) => callback(processedResults, processedError));
   });
