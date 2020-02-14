@@ -68,6 +68,7 @@ class ServiceNowAdapter extends EventEmitter {
    * @param {ServiceNowAdapter~adapterProperties} adapterProperties - Adapter instance's properties object.
    */
   constructor(id, adapterProperties) {
+      log.info("inside constructor"+adapterProperties.url+" "+adapterProperties.auth.username);
     // Call super or parent class' constructor.
     super();
     // Copy arguments' values to object properties.
@@ -100,7 +101,7 @@ class ServiceNowAdapter extends EventEmitter {
   connect() {
     // As a best practice, Itential recommends isolating the health check action
     // in its own method.
-    this.healthcheck();
+   this.healthcheck();
   }
 
   /**
@@ -114,6 +115,7 @@ class ServiceNowAdapter extends EventEmitter {
  *   that handles the response.
  */
 healthcheck(callback) {
+    
  this.getRecord((result, error) => {
    /**
     * For this lab, complete the if else conditional
@@ -150,6 +152,8 @@ healthcheck(callback) {
      this.emitOnline((result, error) => callback(result, error));
    }
  });
+
+
 }
 
   /**
@@ -228,8 +232,8 @@ healthcheck(callback) {
                 }
             }
         }
-
-        return result;
+       
+       return result;
 
     }
 
@@ -279,27 +283,33 @@ healthcheck(callback) {
      * Note how the object was instantiated in the constructor().
      * post() takes a callback function.
      */
-     
-//      this.connector.post(callback, (data, error) => {
-//     if (error) {
-//       console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
-//     }
-//     console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
-//   });
-
-let response = this.connector.post(callback);
- if (response && response !== null && typeof (response === 'object') && ('body' in response)) 
- {
-     var result = response.body.result;
-      if (result.key === 'number'){
+    var callOptions =  {
+      url: this.props.url,
+      username: this.props.auth.username,
+      password: this.props.auth.password,
+      serviceNowTable: this.props.serviceNowTable
+    };
+            let response = this.connector.post(callOptions, callback);
+            
+            if (response && response !== null && typeof (response === 'object') && ('body' in response)) 
+            {
+               
+                var result = response.body.result;
+               
+                for (var key in result) {
+                    if (key === 'number'){
                             result.change_ticket_number = result.number;
                             delete result.number;
                         }else if(key === 'sys_id'){
- result.change_ticket_key = result.sys_id;
+                            result.change_ticket_key = result.sys_id;
                             delete result.sys_id;
+                        }else if( !(key === 'active' || key === 'priority' || key === 'description' || key === 'work_start' || key === 'work_end')) {
+                            delete result[key];
                         }
-                        return result;
- }
+                }
+                
+                return result;
+            }
   }
 }
 

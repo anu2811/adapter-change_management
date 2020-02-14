@@ -143,10 +143,11 @@ isHibernating(response) {
       callback.error = response;
     } else if (this.isHibernating(response)) {
       callback.error = 'Service Now instance is hibernating';
-      console.error(callbackError);
+      console.error(callback.error);
     } else {
       callback.data = response;
     }
+   
     return callback(callback.data, callback.error);
 }
 
@@ -178,7 +179,7 @@ isHibernating(response) {
    * This is not a simple copy/paste of the requestOptions object
    * from the previous lab. There should be no
    * hardcoded values.
-   */
+   */ log.info("connector.js callOptions.method"+ callOptions.method + " "+ this.options.url+" "+uri);
   const requestOptions = {
     method: callOptions.method,
     auth: {
@@ -190,6 +191,7 @@ isHibernating(response) {
   };
   
   request(requestOptions, (error, response, body) => {
+      log.info('connector.js sendRequest response returned from request method'+ response);
     this.processRequestResults(error, response, body, (processedResults, processedError) => callback(processedResults, processedError));
   });
 }
